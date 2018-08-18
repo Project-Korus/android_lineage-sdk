@@ -121,7 +121,7 @@
     <java-symbol type="string" name="build_date" />
     <java-symbol type="string" name="lineage_api_level" />
     <java-symbol type="string" name="lineage_updates" />
-    <java-symbol type="string" name="lineage_version" />
+    <java-symbol type="string" name="korus_version" />
     <java-symbol type="string" name="lineage_vendor_security_patch" />
 
     <!-- General purpose use "unknown" string -->
