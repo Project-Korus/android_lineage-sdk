@@ -32,6 +32,8 @@ import android.os.ServiceManager;
 import android.os.UserHandle;
 import android.util.Log;
 
+import com.android.server.SystemService;
+
 import lineageos.app.LineageContextConstants;
 import lineageos.providers.LineageSettings;
 import lineageos.style.IStyleInterface;
@@ -70,8 +72,15 @@ public class StyleInterfaceService extends LineageSystemService {
 
     @Override
     public void onStart() {
-        mPackageManager = mContext.getPackageManager();
-        mOverlayService = IOverlayManager.Stub.asInterface(ServiceManager.getService("overlay"));
+        /* No-op */
+    }
+
+    @Override
+    public void onBootPhase(int phase) {
+        if (phase == SystemService.PHASE_SYSTEM_SERVICES_READY) {
+            mPackageManager = mContext.getPackageManager();
+            mOverlayService = IOverlayManager.Stub.asInterface(ServiceManager.getService("overlay"));
+        }
     }
 
     private void enforceChangeStylePermission() {
@@ -309,15 +318,7 @@ public class StyleInterfaceService extends LineageSystemService {
         @Override
         public boolean setAccent(String pkgName) {
             enforceChangeStylePermission();
-            /*
-             * We need to clear the caller's identity in order to
-             *   allow this method call to modify settings
-             *   not allowed by the caller's permissions.
-             */
-            long token = clearCallingIdentity();
-            boolean success = setAccentInternal(pkgName);
-            restoreCallingIdentity(token);
-            return success;
+            return setAccentInternal(pkgName);
         }
 
         @Override
@@ -375,15 +376,7 @@ public class StyleInterfaceService extends LineageSystemService {
         @Override
         public boolean setDarkOverlay(String overlayName) {
             enforceChangeStylePermission();
-            /*
-             * We need to clear the caller's identity in order to
-             *   allow this method call to modify settings
-             *   not allowed by the caller's permissions.
-             */
-            long token = clearCallingIdentity();
-            boolean success = setDarkOverlayInternal(overlayName);
-            restoreCallingIdentity(token);
-            return success;
+            return setDarkOverlayInternal(overlayName);
         }
 
         @Override
