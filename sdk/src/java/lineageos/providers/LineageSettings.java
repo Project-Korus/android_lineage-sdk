@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2015-2016 The CyanogenMod Project
- * Copyright (C) 2017-2018 The LineageOS Project
+ * Copyright (C) 2017-2019 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1706,17 +1706,6 @@ public final class LineageSettings {
         public static final Validator STATUS_BAR_BRIGHTNESS_CONTROL_VALIDATOR =
                 sBooleanValidator;
 
-
-        /**
-         * Whether to enable burnin protection
-         0 = 0ff, 1 = on
-         */
-        public static final String SYSTEMUI_BURNIN_PROTECTION = "systemui_burnin_protection";
-
-        /** @hide */
-        public static final Validator SYSTEMUI_BURNIN_PROTECTION_VALIDATOR =
-                sBooleanValidator;
-
         /**
          * Whether or not volume button music controls should be enabled to seek media tracks
          * 0 = 0ff, 1 = on
@@ -2307,7 +2296,6 @@ public final class LineageSettings {
             VALIDATORS.put(QS_SHOW_BRIGHTNESS_SLIDER, QS_SHOW_BRIGHTNESS_SLIDER_VALIDATOR);
             VALIDATORS.put(STATUS_BAR_BRIGHTNESS_CONTROL,
                     STATUS_BAR_BRIGHTNESS_CONTROL_VALIDATOR);
-            VALIDATORS.put(SYSTEMUI_BURNIN_PROTECTION, SYSTEMUI_BURNIN_PROTECTION_VALIDATOR);
             VALIDATORS.put(VOLBTN_MUSIC_CONTROLS, VOLBTN_MUSIC_CONTROLS_VALIDATOR);
             VALIDATORS.put(USE_EDGE_SERVICE_FOR_GESTURES,
                     USE_EDGE_SERVICE_FOR_GESTURES_VALIDATOR);
@@ -3015,13 +3003,6 @@ public final class LineageSettings {
         public static final String VIBRATOR_INTENSITY = "vibrator_intensity";
 
         /**
-         * Display gamma calibration values
-         * Suffix this with the control to set
-         * @hide
-         */
-        public static final String DISPLAY_GAMMA_CALIBRATION_PREFIX = "display_gamma_";
-
-        /**
          * Current active & enabled Weather Provider Service
          *
          * @hide
@@ -3104,6 +3085,18 @@ public final class LineageSettings {
         /** @hide */
         @Deprecated
         public static final Validator TRUST_NOTIFICATIONS_VALIDATOR =
+                sBooleanValidator;
+
+        /**
+         * Restrict USB when the screen is locked
+         * 0 = Off, 1 = On
+         *
+         * @hide
+         */
+        public static final String TRUST_RESTRICT_USB_KEYGUARD = "trust_restrict_usb";
+
+        /** @hide */
+        public static final Validator TRUST_RESTRICT_USB_KEYGUARD_VALIDATOR =
                 sBooleanValidator;
 
         /**
@@ -3229,6 +3222,7 @@ public final class LineageSettings {
             VALIDATORS.put(NETWORK_TRAFFIC_UNITS, NETWORK_TRAFFIC_UNITS_VALIDATOR);
             VALIDATORS.put(NETWORK_TRAFFIC_SHOW_UNITS, NETWORK_TRAFFIC_SHOW_UNITS_VALIDATOR);
             VALIDATORS.put(TRUST_NOTIFICATIONS, TRUST_NOTIFICATIONS_VALIDATOR);
+            VALIDATORS.put(TRUST_RESTRICT_USB_KEYGUARD, TRUST_RESTRICT_USB_KEYGUARD_VALIDATOR);
             VALIDATORS.put(TRUST_WARNINGS, TRUST_WARNINGS_VALIDATOR);
         }
 

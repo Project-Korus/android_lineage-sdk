@@ -51,7 +51,7 @@ public class LineageDatabaseHelper extends SQLiteOpenHelper{
     private static final boolean LOCAL_LOGV = false;
 
     private static final String DATABASE_NAME = "lineagesettings.db";
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
 
     private static final String DATABASE_NAME_OLD = "cmsettings.db";
 
@@ -206,13 +206,11 @@ public class LineageDatabaseHelper extends SQLiteOpenHelper{
             db.beginTransaction();
             try {
                 loadSettings(db);
-
                 db.setTransactionSuccessful();
-
-                upgradeVersion = 2;
             } finally {
                 db.endTransaction();
             }
+            upgradeVersion = 2;
         }
 
         if (upgradeVersion < 3) {
@@ -364,22 +362,37 @@ public class LineageDatabaseHelper extends SQLiteOpenHelper{
             }
             upgradeVersion = 10;
         }
-        // *** Remember to update DATABASE_VERSION above!
 
-        if (upgradeVersion < newVersion) {
-            Log.w(TAG, "Got stuck trying to upgrade db. Old version: " + oldVersion
-                    + ", version stuck at: " +  upgradeVersion + ", new version: "
-                            + newVersion + ". Must wipe the lineage settings provider.");
-
-            dropDbTable(db, LineageTableNames.TABLE_SYSTEM);
-            dropDbTable(db, LineageTableNames.TABLE_SECURE);
-
+        if (upgradeVersion < 11) {
+            // Move force_show_navbar to system
             if (mUserHandle == UserHandle.USER_OWNER) {
-                dropDbTable(db, LineageTableNames.TABLE_GLOBAL);
-            }
+                db.beginTransaction();
+                SQLiteStatement stmt = null;
+                try {
+                    stmt = db.compileStatement("SELECT value FROM global WHERE name=?");
+                    stmt.bindString(1, LineageSettings.Global.DEV_FORCE_SHOW_NAVBAR);
+                    long value = stmt.simpleQueryForLong();
 
-            onCreate(db);
+                    stmt = db.compileStatement("INSERT INTO system (name, value) VALUES (?, ?)");
+                    stmt.bindString(1, LineageSettings.System.FORCE_SHOW_NAVBAR);
+                    stmt.bindLong(2, value);
+                    stmt.execute();
+
+                    stmt = db.compileStatement("DELETE FROM global WHERE name=?");
+                    stmt.bindString(1, LineageSettings.Global.DEV_FORCE_SHOW_NAVBAR);
+                    stmt.execute();
+
+                    db.setTransactionSuccessful();
+                } catch (SQLiteDoneException ex) {
+                    // LineageSettings.Global.DEV_FORCE_SHOW_NAVBAR is not set
+                } finally {
+                    if (stmt != null) stmt.close();
+                    db.endTransaction();
+                }
+            }
+            upgradeVersion = 11;
         }
+        // *** Remember to update DATABASE_VERSION above!
     }
 
     private void moveSettingsToNewTable(SQLiteDatabase db,
@@ -473,6 +486,9 @@ public class LineageDatabaseHelper extends SQLiteOpenHelper{
             stmt = db.compileStatement("INSERT OR IGNORE INTO system(name,value)"
                     + " VALUES(?,?);");
             // System
+            loadIntegerSetting(stmt, LineageSettings.System.FORCE_SHOW_NAVBAR,
+                    R.integer.def_force_show_navbar);
+
             loadIntegerSetting(stmt, LineageSettings.System.STATUS_BAR_QUICK_QS_PULLDOWN,
                     R.integer.def_qs_quick_pulldown);
 
@@ -527,10 +543,6 @@ public class LineageDatabaseHelper extends SQLiteOpenHelper{
             stmt = db.compileStatement("INSERT OR IGNORE INTO global(name,value)"
                     + " VALUES(?,?);");
             // Global
-            loadIntegerSetting(stmt,
-                    LineageSettings.Global.DEV_FORCE_SHOW_NAVBAR,
-                    R.integer.def_force_show_navbar);
-
             loadBooleanSetting(stmt,
                     LineageSettings.Global.POWER_NOTIFICATIONS_ENABLED,
                     R.bool.def_power_notifications_enabled);
